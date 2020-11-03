@@ -112,6 +112,8 @@ class Game {
         ctx.fill();
 
         // Call this method again on the next animation frame
+        // A quick-and-dirty game over situation: just stop animating :/
+        // The user must hit F5 to reload the game
         if (!gameover) {
             requestAnimationFrame(this.animate);
         }
