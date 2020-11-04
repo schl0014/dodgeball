@@ -29,6 +29,11 @@ class Game {
         this.canvas.width = window.innerWidth - 1;
         this.canvas.height = window.innerHeight - 4; 
         
+        // Transform the rendering context so that (0,0) is the lower left 
+        // corner.
+        const ctx = this.canvas.getContext('2d');
+        ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
+
         // Spawn a Ball
         this.ballRadius = 25 + 25 * Math.random();
         this.ballSpeedX = -50 + 100 * Math.random();
@@ -99,16 +104,15 @@ class Game {
         // Draw the player
         ctx.fillStyle = 'red';
         ctx.beginPath();
-        const playerPositionY = this.canvas.height - 50;
-        ctx.ellipse(this.playerPositionX, playerPositionY, 50, 50, 0, 0, 2*Math.PI);
+        ctx.ellipse(this.playerPositionX, 50, 50, 50, 0, 0, 2*Math.PI);
         ctx.fill();
 
         // Draw the ball
         ctx.fillStyle = 'blue';
         ctx.beginPath();
         // reverse height, so the ball falls down
-        const y = this.canvas.height - this.ballPositionY;
-        ctx.ellipse(this.ballPositionX, y, this.ballRadius, this.ballRadius, 0, 0, 2*Math.PI);
+        ctx.ellipse(this.ballPositionX, this.ballPositionY, this.ballRadius, 
+            this.ballRadius, 0, 0, 2*Math.PI);
         ctx.fill();
 
         // Call this method again on the next animation frame
