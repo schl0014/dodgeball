@@ -38,7 +38,7 @@ class Game {
 
         // Spawn a Ball
         this.ballRadius = 25 + 25 * Math.random();
-        this.ballSpeedX = -50 + 100 * Math.random();
+        this.ballSpeedX = -5 + 10 * Math.random();
         this.ballSpeedY = 0;
         this.ballPositionX = this.ballRadius +  
             (this.canvas.width - 2 * this.ballRadius)*Math.random();
@@ -68,12 +68,12 @@ class Game {
         // Some physics here: the y-portion of the speed changes due to gravity
         // Formula: Vt = V0 + gt
         // 9.8 is the gravitational constant and time=1
-        this.ballSpeedY -= 0.98; 
+        this.ballSpeedY -= 0.0098 * elapsed; 
         // Calculate new X and Y parts of the position 
         // Formula: S = v*t
         this.ballPositionX += this.ballSpeedX * elapsed;
         // Formula: S=v0*t + 0.5*g*t^2
-        this.ballPositionY += this.ballSpeedY * elapsed + 0.5 * 0.98 * elapsed * elapsed;
+        this.ballPositionY += this.ballSpeedY * elapsed + 0.5 * 0.0098 * elapsed * elapsed;
 
         // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
