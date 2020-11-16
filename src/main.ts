@@ -22,6 +22,8 @@ class Game {
 
     private playerPositionX: number;
 
+    private previous: number;
+
     public constructor(canvas: HTMLElement) {
         this.canvas = <HTMLCanvasElement>canvas;
         
@@ -47,7 +49,8 @@ class Game {
 
         // Start the animation
         console.log('start animation');
-        requestAnimationFrame(this.animate);
+        this.previous = performance.now();
+        requestAnimationFrame(this.step);
     }
 
 
@@ -56,19 +59,23 @@ class Game {
      * working correctly. It will be overwritten by another object otherwise
      * caused by javascript scoping behaviour.
      */
-    animate = () => {
-        // move: calculate the new position of the ball
+    step = (timestamp: number) => {
+        // Timedifference (t) in ms between previous and now
+        const elapsed = timestamp - this.previous;
+        this.previous = timestamp;
+
+        // Calculate the new position of the ball
         // Some physics here: the y-portion of the speed changes due to gravity
         // Formula: Vt = V0 + gt
         // 9.8 is the gravitational constant and time=1
         this.ballSpeedY -= 0.98; 
         // Calculate new X and Y parts of the position 
         // Formula: S = v*t
-        this.ballPositionX += this.ballSpeedX;
+        this.ballPositionX += this.ballSpeedX * elapsed;
         // Formula: S=v0*t + 0.5*g*t^2
-        this.ballPositionY += this.ballSpeedY + 0.5 * 0.98;
+        this.ballPositionY += this.ballSpeedY * elapsed + 0.5 * 0.98 * elapsed * elapsed;
 
-        // collide: check if the ball hits the walls and let it bounce
+        // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
             this.ballPositionX >= this.canvas.width-this.ballRadius;
         if(this.ballPositionX <= this.ballRadius && this.ballSpeedX<0) {
@@ -85,8 +92,7 @@ class Game {
             this.ballSpeedY = -this.ballSpeedY;
         }
 
-        // adjust: Check if the ball collides with the player. It's game over 
-        // then
+        //  if the ball collides with the player. It's game over then
         const distX = this.playerPositionX - this.ballPositionX;
         const distY = 50 - this.ballPositionY;
         // Calculate the distance between ball and player using Pythagoras'
@@ -95,19 +101,19 @@ class Game {
         // Collides is distance <= sum of radii of both circles
         const gameover = distance <= (this.ballRadius + 50);
 
-        // draw: the items on the canvas
+        // Render the items on the canvas
         // Get the canvas rendering context
         const ctx = this.canvas.getContext('2d');
         // Clear the entire canvas
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw the player
+        // Render the player
         ctx.fillStyle = 'red';
         ctx.beginPath();
         ctx.ellipse(this.playerPositionX, 50, 50, 50, 0, 0, 2*Math.PI);
         ctx.fill();
 
-        // Draw the ball
+        // Render the ball
         ctx.fillStyle = 'blue';
         ctx.beginPath();
         // reverse height, so the ball falls down
@@ -119,7 +125,7 @@ class Game {
         // A quick-and-dirty game over situation: just stop animating :/
         // The user must hit F5 to reload the game
         if (!gameover) {
-            requestAnimationFrame(this.animate);
+            requestAnimationFrame(this.step);
         }
     }
 
