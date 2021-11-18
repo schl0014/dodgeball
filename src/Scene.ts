@@ -6,7 +6,7 @@ export default class Scene {
 
   private playerPositionX: number;
 
-  private ball: Ball;
+  private balls: Array<Ball> = [];
 
   /**
    * Construc a new instance of this class
@@ -20,8 +20,10 @@ export default class Scene {
     this.canvas.width = window.innerWidth - 1;
     this.canvas.height = window.innerHeight - 4;
 
-    // Spawn a Ball
-    this.ball = new Ball(this.canvas);
+    // Spawn the Balls
+    for (let i = 0; i < Game.INITIAL_BALL_COUNT; i++) {
+      this.balls.push(new Ball(this.canvas));
+    }
 
     // Set the player at the center
     this.playerPositionX = this.canvas.width / 2;
@@ -41,12 +43,18 @@ export default class Scene {
    * @returns `true` if the game is over
    */
   public update(t: number): boolean {
-    this.ball.applyPhysics(t);
+    this.balls.forEach((ball: Ball) => {
+      ball.applyPhysics(t);
+      ball.bounceFromCanvasWalls(this.canvas);
+    });
 
-    this.ball.bounceFromCanvasWalls(this.canvas);
-
-    return this.ball.overlapsWith(this.playerPositionX, Game.PLAYER_BALL_RADIUS,
-      Game.PLAYER_BALL_RADIUS);
+    return this.balls.reduce(
+      (previousReturn: boolean, ball: Ball) => previousReturn
+        || ball.overlapsWith(
+          this.playerPositionX, Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS,
+        ),
+      false,
+    );
   }
 
   /**
@@ -67,6 +75,8 @@ export default class Scene {
     ctx.fill();
 
     // Draw the ball
-    this.ball.render(this.canvas, ctx);
+    this.balls.forEach((ball: Ball) => {
+      ball.render(this.canvas, ctx);
+    });
   }
 }
