@@ -18,6 +18,8 @@ class Game {
 
   private playerPositionX: number;
 
+  private lastTickTimeStamp : number;
+
   /**
    * Construc a new instance of this class
    *
@@ -45,23 +47,31 @@ class Game {
   /**
    * Start the game.
    */
-  public start() {
+  public start(): void {
     // Start the animation
     console.log('start animation');
-    requestAnimationFrame(this.animate);
+    // Set the last tick timestamp to current time
+    this.lastTickTimeStamp = performance.now();
+    requestAnimationFrame(this.step);
   }
 
   /**
-   * This MUST be an arrow method in order to keep the `this` variable
-   * working correctly. It will be overwritten by another object otherwise
-   * caused by javascript scoping behaviour.
+   * This MUST be an arrow method in order to keep the `this` variable working
+   * correctly. It will otherwise be overwritten by another object caused by
+   * javascript scoping behaviour.
+   *
+   * @param timestamp a `DOMHighResTimeStamp` similar to the one returned by
+   *   `performance.now()`, indicating the point in time when `requestAnimationFrame()`
+   *   starts to execute callback functions
    */
-  animate = () => {
-    // move: calculate the new position of the ball
-    // Some physics here: the y-portion of the speed changes due to gravity
+  private step = (timestamp: number): void => {
     // To make it as accurate as possible, incorporate the time t
     // At 60fps, each interval is approximately 17ms.
-    const t = 1000 / 60;
+    const t = timestamp - this.lastTickTimeStamp;
+    this.lastTickTimeStamp = timestamp;
+
+    // move: calculate the new position of the ball
+    // Some physics here: the y-portion of the speed changes due to gravity
     // Formula: Vt = V0 + gt
     // 9.8 is the gravitational constant
     this.ballSpeedY -= 0.0098 * t;
@@ -120,7 +130,7 @@ class Game {
 
     // Call this method again on the next animation frame
     if (!gameover) {
-      requestAnimationFrame(this.animate);
+      requestAnimationFrame(this.step);
     }
   };
 }
