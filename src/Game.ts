@@ -31,15 +31,22 @@ export default class Game {
     this.canvas.height = window.innerHeight - 4;
 
     // Spawn a Ball
+    this.createBall();
+
+    // Set the player at the center
+    this.playerPositionX = this.canvas.width / 2;
+  }
+
+  /**
+   * Creates a new Ball.
+   */
+  private createBall(): void {
     this.ballRadius = 25 + 25 * Math.random();
     this.ballSpeedX = -5 + 10 * Math.random();
     this.ballSpeedY = 0;
     this.ballPositionX = this.ballRadius
       + (this.canvas.width - 2 * this.ballRadius) * Math.random();
     this.ballPositionY = this.canvas.height * 0.8 + this.canvas.height * 0.2 * Math.random();
-
-    // Set the player at the center
-    this.playerPositionX = this.canvas.width / 2;
   }
 
   /**
