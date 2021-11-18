@@ -43,31 +43,12 @@ export default class Game {
   }
 
   /**
-   * Start the game.
-   */
-  public start(): void {
-    // Start the animation
-    console.log('start animation');
-    // Set the last tick timestamp to current time
-    this.lastTickTimeStamp = performance.now();
-    requestAnimationFrame(this.step);
-  }
-
-  /**
-   * This MUST be an arrow method in order to keep the `this` variable working
-   * correctly. It will otherwise be overwritten by another object caused by
-   * javascript scoping behaviour.
+   * Update the game
    *
-   * @param timestamp a `DOMHighResTimeStamp` similar to the one returned by
-   *   `performance.now()`, indicating the point in time when `requestAnimationFrame()`
-   *   starts to execute callback functions
+   * @param t time
+   * @returns `true` if the game is over
    */
-  private step = (timestamp: number): void => {
-    // To make it as accurate as possible, incorporate the time t
-    // At 60fps, each interval is approximately 17ms.
-    const t = timestamp - this.lastTickTimeStamp;
-    this.lastTickTimeStamp = timestamp;
-
+  private update(t: number): boolean {
     // move: calculate the new position of the ball
     // Some physics here: the y-portion of the speed changes due to gravity
     // Formula: Vt = V0 + gt
@@ -104,7 +85,13 @@ export default class Game {
     const distance = Math.sqrt(distX * distX + distY * distY);
     // Collides is distance <= sum of radii of both circles
     const gameover = distance <= (this.ballRadius + 50);
+    return gameover;
+  }
 
+  /**
+   * Draws the game to the canvas
+   */
+  private draw() {
     // draw: the items on the canvas
     // Get the canvas rendering context
     const ctx = this.canvas.getContext('2d');
@@ -125,6 +112,37 @@ export default class Game {
     const y = this.canvas.height - this.ballPositionY;
     ctx.ellipse(this.ballPositionX, y, this.ballRadius, this.ballRadius, 0, 0, 2 * Math.PI);
     ctx.fill();
+  }
+
+  /**
+   * Start the game.
+   */
+  public start(): void {
+    // Start the animation
+    console.log('start animation');
+    // Set the last tick timestamp to current time
+    this.lastTickTimeStamp = performance.now();
+    requestAnimationFrame(this.step);
+  }
+
+  /**
+   * This MUST be an arrow method in order to keep the `this` variable working
+   * correctly. It will otherwise be overwritten by another object caused by
+   * javascript scoping behaviour.
+   *
+   * @param timestamp a `DOMHighResTimeStamp` similar to the one returned by
+   *   `performance.now()`, indicating the point in time when `requestAnimationFrame()`
+   *   starts to execute callback functions
+   */
+  private step = (timestamp: number): void => {
+    // To make it as accurate as possible, incorporate the time t
+    // At 60fps, each interval is approximately 17ms.
+    const t = timestamp - this.lastTickTimeStamp;
+    this.lastTickTimeStamp = timestamp;
+
+    const gameover = this.update(t);
+
+    this.draw();
 
     // Call this method again on the next animation frame
     if (!gameover) {
