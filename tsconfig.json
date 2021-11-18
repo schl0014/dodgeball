@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "module": "es6",
+        "target": "esnext",
         "sourceMap": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "removeComments": true,
-        "outFile": "build/app.js",
+        "outDir": "build/",
         "noEmitOnError": true
     },
     "include": [
