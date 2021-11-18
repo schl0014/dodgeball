@@ -1,19 +1,12 @@
 import Game from 'Game.js';
+import Ball from './Ball';
 
 export default class Scene {
   private canvas: HTMLCanvasElement;
 
-  private ballRadius: number;
-
-  private ballPositionX: number;
-
-  private ballPositionY: number;
-
-  private ballSpeedX: number;
-
-  private ballSpeedY: number;
-
   private playerPositionX: number;
+
+  private ball: Ball;
 
   /**
    * Construc a new instance of this class
@@ -28,23 +21,10 @@ export default class Scene {
     this.canvas.height = window.innerHeight - 4;
 
     // Spawn a Ball
-    this.createBall();
+    this.ball = new Ball(this.canvas);
 
     // Set the player at the center
     this.playerPositionX = this.canvas.width / 2;
-  }
-
-  /**
-   * Creates a new Ball.
-   */
-  private createBall(): void {
-    this.ballRadius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
-    this.ballSpeedX = Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random();
-    this.ballSpeedY = Game.MIN_BALL_Y_SPEED;
-    this.ballPositionX = this.ballRadius
-      + (this.canvas.width - 2 * this.ballRadius) * Math.random();
-    this.ballPositionY = this.canvas.height * Game.BALL_Y_POSITION_AREA
-      + this.canvas.height * Game.BALL_Y_POSITION_SCATTER * Math.random();
   }
 
   // /**
@@ -61,43 +41,12 @@ export default class Scene {
    * @returns `true` if the game is over
    */
   public update(t: number): boolean {
-    // move: calculate the new position of the ball
-    // Some physics here: the y-portion of the speed changes due to gravity
-    // Formula: Vt = V0 + gt
-    // 9.8 is the gravitational constant
-    this.ballSpeedY -= Game.GRAVITY * t;
-    // Calculate new X and Y parts of the position
-    // Formula: S = v*t
-    this.ballPositionX += this.ballSpeedX * t;
-    // Formula: S=v0*t + 0.5*g*t^2
-    this.ballPositionY += this.ballSpeedY * t + 0.5 * Game.GRAVITY * t * t;
+    this.ball.applyPhysics(t);
 
-    // collide: check if the ball hits the walls and let it bounce
-    // Left wall
-    if (this.ballPositionX <= this.ballRadius && this.ballSpeedX < 0) {
-      this.ballSpeedX = -this.ballSpeedX;
-    }
-    // Right wall
-    if (this.ballPositionX >= this.canvas.width - this.ballRadius
-      && this.ballSpeedX > 0) {
-      this.ballSpeedX = -this.ballSpeedX;
-    }
+    this.ball.bounceFromCanvasWalls(this.canvas);
 
-    // Bottom only (ball will always come down)
-    if (this.ballPositionY <= this.ballRadius && this.ballSpeedY < 0) {
-      this.ballSpeedY = -this.ballSpeedY;
-    }
-
-    // adjust: Check if the ball collides with the player. It's game over
-    // then
-    const distX = this.playerPositionX - this.ballPositionX;
-    const distY = 50 - this.ballPositionY;
-    // Calculate the distance between ball and player using Pythagoras'
-    // theorem
-    const distance = Math.sqrt(distX * distX + distY * distY);
-    // Collides is distance <= sum of radii of both circles
-    const gameover = distance <= (this.ballRadius + 50);
-    return gameover;
+    return this.ball.overlapsWith(this.playerPositionX, Game.PLAYER_BALL_RADIUS,
+      Game.PLAYER_BALL_RADIUS);
   }
 
   /**
@@ -118,12 +67,6 @@ export default class Scene {
     ctx.fill();
 
     // Draw the ball
-    ctx.fillStyle = 'blue';
-    ctx.beginPath();
-    // reverse height, so the ball falls down
-    const y = this.canvas.height - this.ballPositionY;
-    ctx.ellipse(this.ballPositionX, y, this.ballRadius, this.ballRadius, 0, 0,
-      2 * Game.FULL_CIRCLE);
-    ctx.fill();
+    this.ball.render(this.canvas, ctx);
   }
 }
