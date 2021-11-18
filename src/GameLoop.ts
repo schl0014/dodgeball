@@ -28,7 +28,7 @@ export default class GameLoop {
   /**
    * The current mode of the gameloop
    */
-  private mode;
+  private mode: number;
 
   /**
    * The current state of this gameloop

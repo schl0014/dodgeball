@@ -93,7 +93,7 @@ export default class Ball {
    * @param canvas the canvas to render on
    * @param ctx the rendering context to draw on
    */
-  render(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
+  public render(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = 'blue';
     ctx.beginPath();
     // reverse height, so the ball falls down

@@ -33,8 +33,6 @@ export default class Game {
 
   public static readonly PLAYER_COLOR = 'red';
 
-  private lastTickTimeStamp : number;
-
   private scene: Scene;
 
   private gameloop: GameLoop;
