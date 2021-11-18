@@ -1,5 +1,5 @@
-import Game from 'Game.js';
-import Ball from './Ball';
+import Game from './Game.js';
+import Ball from './Ball.js';
 
 export default class Scene {
   private canvas: HTMLCanvasElement;

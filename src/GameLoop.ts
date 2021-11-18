@@ -1,4 +1,4 @@
-import Scene from 'Scene.js';
+import Scene from './Scene.js';
 
 /**
  * Represents a basic Game Loop based on `requestAnimationFrame()`.
