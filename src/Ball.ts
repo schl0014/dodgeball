@@ -1,15 +1,17 @@
 import Game from './Game.js';
 
 export default class Ball {
-  private radius: number;
-
-  private positionX: number;
-
   private positionY: number;
 
   private speedX: number;
 
   private speedY: number;
+
+  private radius: number;
+
+  private positionX: number;
+
+  private randomcolor: string;
 
   /**
    * Constructs a new Ball
@@ -17,6 +19,8 @@ export default class Ball {
    * @param canvas the canvas to place the ball on
    */
   public constructor(canvas: HTMLCanvasElement) {
+    this.randomcolor = Math.floor(Math.random() * 16777215).toString(16);
+
     this.radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
     this.speedX = Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random();
     this.speedY = Game.MIN_BALL_Y_SPEED;
@@ -75,7 +79,7 @@ export default class Ball {
    * @param r the radius of the player
    * @returns `true` if the ball overlaps with the player
    */
-  public overlapsWith(x: number, y:number, r: number): boolean {
+  public overlapsWith(x: number, y: number, r: number): boolean {
     // adjust: Check if the ball collides with the player. It's game over
     // then
     const distX = x - this.positionX;
@@ -94,7 +98,7 @@ export default class Ball {
    * @param ctx the rendering context to draw on
    */
   public render(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = `#${this.randomcolor}`;
     ctx.beginPath();
     // reverse height, so the ball falls down
     const y = canvas.height - this.positionY;

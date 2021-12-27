@@ -1,10 +1,11 @@
 import Game from './Game.js';
 import Ball from './Ball.js';
+import Player from './player.js';
 
 export default class Scene {
-  private canvas: HTMLCanvasElement;
+  private player: Player;
 
-  private playerPositionX: number;
+  private canvas: HTMLCanvasElement;
 
   private balls: Array<Ball> = [];
 
@@ -19,22 +20,32 @@ export default class Scene {
     // Resize the canvas to full window size
     this.canvas.width = window.innerWidth - 1;
     this.canvas.height = window.innerHeight - 4;
+    this.player = new Player(this.canvas.height, this.canvas.width);
 
     // Spawn the Balls
     for (let i = 0; i < Game.INITIAL_BALL_COUNT; i++) {
       this.balls.push(new Ball(this.canvas));
     }
-
-    // Set the player at the center
-    this.playerPositionX = this.canvas.width / 2;
   }
 
-  // /**
-  //   * Handles any user input that has happened since the last call
-  //   */
-  // public processInput(): void {
+  /**
+   *  Handles any user input that has happened since the last call
+   */
+  public processInput(): void {
+    // the player goes left
+    this.player.left();
+    // the player goes right
+    this.player.right();
+    // the player goes down
+    this.player.down();
+    // the player goes up
+    this.player.up();
+    // Prevents the player from passing the x borders
+    this.player.preventPlayerBorderX();
 
-  // }
+    // Prevents the player from passing the y borders
+    this.player.preventPlayerBorderY();
+  }
 
   /**
    * Update the game
@@ -51,7 +62,7 @@ export default class Scene {
     return this.balls.reduce(
       (previousReturn: boolean, ball: Ball) => previousReturn
         || ball.overlapsWith(
-          this.playerPositionX, Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS,
+          this.player.playerPositionX, this.player.playerPositionY, Player.PLAYER_BALL_RADIUS,
         ),
       false,
     );
@@ -66,12 +77,15 @@ export default class Scene {
     const ctx = this.canvas.getContext('2d');
     // Clear the entire canvas
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     // Draw the player
     ctx.fillStyle = 'red';
     ctx.beginPath();
-    const playerPositionY = this.canvas.height - 50;
-    ctx.ellipse(this.playerPositionX, playerPositionY, 50, 50, 0, 0, 2 * Game.FULL_CIRCLE);
+    ctx.ellipse(this.player.playerPositionX, this.player.playerCanvasPositionY,
+      50, 50, 0, 0, 2 * Game.FULL_CIRCLE);
+    ctx.ellipse(this.player.handsLeftPositonX, this.player.playerCanvasLeftPositionY,
+      50, 50, 0, 0, 2 * Game.FULL_CIRCLE);
+    ctx.ellipse(this.player.handsRightPositionX, this.player.playerCanvasRightPositionY,
+      50, 50, 0, 0, 2 * Game.FULL_CIRCLE);
     ctx.fill();
 
     // Draw the ball
